@@ -61,10 +61,10 @@ short press up - volume minus 6<br>
 press down and hold - volume down continuously<br>
 
 Default setting:
-play mode = NORMAL play
-keys      = ENBALE	  
-scan available digit pins = DISABLE	 
-scan available analog pins= DISABLE 
+play mode = NORMAL play<br>
+keys      = ENBALE	  <br>
+scan available digit pins = DISABLE	 <br>
+scan available analog pins= DISABLE <br>
 create an empty playlist
 
 ### API:
