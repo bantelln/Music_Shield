@@ -17,7 +17,7 @@ does some process control, like play/pause.
 ### Usage:
 1. Downlaod this library. Two way to do this:<br>
 a. click the "Download ZIP" link right down at this page;<br>
-b. use a git client to make a clone of "https://github.com/Seeed-Studio/Music_Shield.git"(add -b musicshield_lib_for_hw_v2 to checkout the related branch)<br>
+b. use a git client to make a clone of "https://github.com/Seeed-Studio/Music_Shield.git" (add -b musicshield_lib_for_hw_v2 to checkout the related branch)<br>
 
 2. Copy files(unzip if you downloaded a zip) into a dir named "MusicPlayer";
 
@@ -60,12 +60,12 @@ press up and hold - volume up continuously<br>
 short press up - volume minus 6<br>
 press down and hold - volume down continuously<br>
 
-Default setting:
+Default setting:<br>
 play mode = NORMAL play<br>
 keys      = ENBALE	  <br>
 scan available digit pins = DISABLE	 <br>
 scan available analog pins= DISABLE <br>
-create an empty playlist
+create an empty playlist<br>
 
 ### API:
     
