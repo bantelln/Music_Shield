@@ -912,3 +912,104 @@ int Key::getPress(void)
   return -1;
 }
 
+/**********************************Midi Player Part***************************/
+
+/*
+ **@ function:beginInMidiFmt
+ **@ usage:Init the Midi Player
+ **@ input:none
+ **@ output:none
+*/
+void MusicPlayer::beginInMidiFmt(void)
+{
+  initIOForLED();
+   
+  //Init VS105B in Midi Format
+  Serial.print("Init vs10xx in MIDI format...");
+  vs1053.initForMidiFmt();
+  Serial.print("done\r\n");  
+
+  pinMode(chipSelect, OUTPUT);
+}
+
+/*
+ **@ function:midiWriteData
+ **@ usage:Write data to Midi Player
+ **@ input:
+ **@ output:none
+*/
+void MusicPlayer::midiWriteData(byte cmd, byte high, byte low)
+{
+  while(!digitalRead(VS_DREQ));
+  digitalWrite(VS_XDCS, LOW);
+  midiSendByte(cmd);
+  if((cmd & 0xF0) <= 0xB0 || (cmd & 0xF0) >= 0xE0)
+  {
+    midiSendByte(high);
+    midiSendByte(low);
+  }  
+  else
+  {
+    midiSendByte(high);
+  }
+  digitalWrite(VS_XDCS, HIGH);
+}
+
+
+void MusicPlayer::midiNoteOn(byte channel, byte note, byte rate)
+{
+  midiWriteData((0x90 | channel), note, rate);
+}
+
+void MusicPlayer::midiNoteOff(byte channel, byte note, byte rate)
+{
+  midiWriteData((0x80 | channel), note, rate);
+}
+
+void MusicPlayer::midiSendByte(byte data)
+{
+  SPI.transfer(0x00);
+  SPI.transfer(data); 
+}
+
+/*
+ **@ function:demoPlayer
+ **@ usage:A Midi demo Player
+ **@ input:none
+ **@ output:none
+*/
+void MusicPlayer::midiDemoPlayer(void)
+{
+  delay(1000);
+  midiWriteData(0xB0, 0x07, 120);
+  
+  //GM2 Mode
+  Serial.print("Fancy Midi Sounds\r\n");
+  midiWriteData(0xB0, 0, 0x78);  
+  for(int instrument = 30 ; instrument < 31 ; instrument++)
+  { 
+    Serial.print(" Instrument: ");
+    Serial.println(instrument, DEC);
+ 
+    midiWriteData(0xC0, instrument, 0);    //Set instrument number. 0xC0 is a 1 data byte command
+ 
+    //Play notes from F#-0 (30) to F#-5 (90):
+    for (int note = 27 ; note < 87 ; note++) 
+    {
+      Serial.print("N:");
+      Serial.println(note, DEC);
+      //Note on channel 1 (0x90), some note value (note), middle velocity (0x45):
+      midiNoteOn(0, note, 127);
+      delay(50);
+ 
+      //Turn off the note with a given off/release velocity
+      midiNoteOff(0, note, 127);
+      delay(50);
+    }
+ 
+    //delay 100ms between each instruments
+    delay(100);
+    } 
+}
+
+

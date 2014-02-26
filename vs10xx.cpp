@@ -6,7 +6,8 @@
 //  Version: 2.0
 //  Time: June 2, 2012
 //  Changing records:
-//
+//  Oliver Wang add: function loadMidiPlugin() for midi player
+//  Time:Feb 26th 2014
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
 //  License as published by the Free Software Foundation; either
@@ -24,6 +25,22 @@
 #include "vs10xx.h"
 #include "pins_config.h"
 VS10XX vs1053;
+
+//software patch for MIDI Play
+const unsigned short gVS1053_MIDI_Patch[28]={
+/*if you don't let GPIO1 = H,please send this patch by spi*/
+0x0007, 0x0001, 0x8050, 0x0006, 0x0014, 0x0030, 0x0715, 0xb080, /* 0 */
+0x3400, 0x0007, 0x9255, 0x3d00, 0x0024, 0x0030, 0x0295, 0x6890, /* 8 */
+0x3400, 0x0030, 0x0495, 0x3d00, 0x0024, 0x2908, 0x4d40, 0x0030, /* 10 */
+0x0200, 0x000a, 0x0001, 0x0050,
+};
+
+/*
+ **@ function name: init
+ **@ usage:init the vs10xx chip
+ **@ input:none
+ **@ retval:none
+*/
 void VS10XX::init(void)
 {
   SPI.begin();
@@ -31,6 +48,31 @@ void VS10XX::init(void)
   initIO();
   reset();
 }
+
+/*
+ **@ function name: initForMidiFmt
+ **@ usage:init the vs10xx chip for midi Mode
+ **@ input:none
+ **@ retval:none
+*/
+void VS10XX::initForMidiFmt(void)
+{
+  //init IO
+  initIO();
+
+  //init SPI
+  SPI.begin();
+  SPI.setBitOrder(MSBFIRST);
+  SPI.setDataMode(SPI_MODE0);
+  SPI.setClockDivider(SPI_CLOCK_DIV16);
+  //SPI.transfer(0xFF);	//transfer a dump
+  
+  //reset the chip
+  reset();
+  //load MIDI plugin
+  loadMidiPlugin();	
+}
+
 void VS10XX::initIO(void)
 {
   pinMode(VS_XRESET, OUTPUT);
@@ -147,5 +189,29 @@ void VS10XX::sendZerosToVS10xx(void)
     SPI.transfer(0);
   }
   deselectDataBus();
+}
+
+/*
+ **@ function name: loadMidiPatch
+ **@ usage:load a software patch for vs10xx
+ **@ input:none
+ **@ retval:none
+*/
+void VS10XX::loadMidiPlugin(void)
+{
+  int i=0;
+  Serial.print("load MIDI Plugin...\r\n");
+  while(i < sizeof(gVS1053_MIDI_Patch)/sizeof(gVS1053_MIDI_Patch[0]))
+  {
+    unsigned short addr, n, val;
+    addr = gVS1053_MIDI_Patch[i++];
+    n = gVS1053_MIDI_Patch[i++];
+    while(n--)
+    {
+      val = gVS1053_MIDI_Patch[i++];
+      writeRegister(addr, val >> 8, val&0xff);
+    }
+  }
+  Serial.print("done\r\n");
 }
 /****************The end***********************************************/

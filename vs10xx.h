@@ -75,6 +75,8 @@ public:
   void releaseFromReset(void)   { digitalWrite(VS_XRESET, HIGH);}
   char readDREQ(void) { return digitalRead(VS_DREQ);}
   void init(void);
+  void initForMidiFmt(void);
+  void loadMidiPlugin(void);
   void initIO(void);
   void writeRegister(unsigned char addressbyte, unsigned char highbyte, unsigned char lowbyte);
   void writeRegister(unsigned char addressbyte, unsigned int value);

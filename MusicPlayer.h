@@ -139,7 +139,8 @@ class MusicPlayer
 {
 public:
   void    begin(void);
-  
+  void    beginInMidiFmt(void);  
+
   void    playOne(char *songName);
   boolean addToPlaylist(char *songName);
   void    scanAndPlayAll(void);
@@ -156,6 +157,7 @@ public:
   void    digitalControlEnable(void) { Digital_Enable = 1;}
           
   void    play(void);
+  void    midiDemoPlayer(void);		//oliver wang
   void    opPlay(void)  { playingState = PS_PLAY;}
   void    opPause(void) { playingState = PS_PAUSE;}
   void    opStop(void)  { playingState = PS_IDLE;}
@@ -196,6 +198,12 @@ private:
   void    _preRecording(void);
   void    _recording(void);
   void    _init_timer1();
+
+  //for Midi Player
+  void midiWriteData(byte cmd, byte high, byte low);
+  void midiNoteOn(byte channel, byte note, byte rate);
+  void midiNoteOff(byte channel, byte note, byte rate);
+  void midiSendByte(byte data);
 };
 
 extern MusicPlayer player;
